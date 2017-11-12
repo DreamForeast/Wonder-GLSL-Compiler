@@ -65,7 +65,7 @@ let _checkCircleImport = (segmentContent: string) => {};
        ++ importSegmentContent
    }, "");
    }; */
-let rec _getAllImportContent = (segmentName: string, segmentContent: string, map) => {
+let _getAllImportContent = (fileName: string, segmentName: string, segmentContent: string, map) => {
   /* let importFlagRe = [%re {|/#import\s+"(.+)"/g|}];
        let break = ref(false);
      while(!( break^ )){
@@ -86,55 +86,68 @@ let rec _getAllImportContent = (segmentName: string, segmentContent: string, map
      }
                 }
      } */
-  let importFlagRe = [%re {|/#import\s+"(.+)"/g|}];
-  let recordArr = [||];
-  let startIndex = ref(0);
-  let break = ref(false);
-  while (! break^) {
-    switch (importFlagRe |> Js.Re.exec(segmentContent)) {
-    | None => break := true
-    | Some(result) =>
-      /* let endIndex = Js.Re.lastIndex(result); */
-      recordArr
-      |> Js.Array.push
-           /* Js.Re.index(result), Js.Re.lastIndex(result),  */
-           ((
-             startIndex,
-             Js.Re.index(result),
-             /* endIndex, */
-             Js.Nullable.bind(
-               Js.Re.captures(result)[1],
-               [@bs]
-               (
-                 (importFileName) =>
-                   switch (Js.Dict.get(map, importFileName)) {
-                   | None => failwith({j|import glsl file:$importFileName should exist|j})
-                   | Some(segmentMap) =>
-                     switch (Js.Dict.get(segmentMap, segmentName)) {
-                     | None =>
-                       failwith({j|segment:$segmentName should exist in $importFileName.glsl|j})
-                     | Some(importContent) =>
-                       if (importFlagRe |> Js.Re.test(importContent)) {
-                         _getAllImportContent(segmentName, importContent, map)
+  let rec _get = (fileNameArr: array(string), segmentName: string, segmentContent: string, map) => {
+    let importFlagRe = [%re {|/#import\s+"(.+)"/g|}];
+    let recordArr = [||];
+    /* let fileNameArr = [||]; */
+    let startIndex = ref(0);
+    let break = ref(false);
+    while (! break^) {
+      switch (importFlagRe |> Js.Re.exec(segmentContent)) {
+      | None => break := true
+      | Some(result) =>
+        /* let endIndex = Js.Re.lastIndex(result); */
+        recordArr
+        |> Js.Array.push
+             /* Js.Re.index(result), Js.Re.lastIndex(result),  */
+             ((
+               startIndex,
+               Js.Re.index(result),
+               /* endIndex, */
+               Js.Nullable.bind(
+                 Js.Re.captures(result)[1],
+                 [@bs]
+                 (
+                   (importFileName) =>
+                     switch (Js.Dict.get(map, importFileName)) {
+                     | None => failwith({j|import glsl file:$importFileName should exist|j})
+                     | Some(segmentMap) =>
+                       let fileName = Js.Dict.unsafeGet(segmentMap, "fileName");
+                       if (Js.Array.includes(fileName, fileNameArr)) {
+                         let msg = (fileNameArr |> Js.Array.joinWith("=>")) ++ "=>" ++ fileName;
+                         failwith({j|not allow circular reference(the reference path is $msg)|j})
                        } else {
-                         importContent
+                         switch (Js.Dict.get(segmentMap, segmentName)) {
+                         | None =>
+                           failwith(
+                             {j|segment:$segmentName should exist in $importFileName.glsl|j}
+                           )
+                         | Some(importContent) =>
+                           if (importFlagRe |> Js.Re.test(importContent)) {
+                             fileNameArr |> Js.Array.push(fileName) |> ignore;
+                             _get(fileNameArr, segmentName, importContent, map)
+                           } else {
+                             importContent
+                           }
+                         }
                        }
                      }
-                   }
+                 )
                )
-             )
-           ));
-      startIndex := Js.Re.lastIndex(importFlagRe)
-    }
+             ));
+        startIndex := Js.Re.lastIndex(importFlagRe)
+      }
+    };
+    recordArr
+    |> Js.Array.reduce(
+         (content, (startIndex, endIndex, importSegmentContent)) =>
+           content
+           ++ (segmentContent |> Js.String.slice(~from=startIndex, ~to_=endIndex))
+           ++ importSegmentContent,
+         ""
+       )
   };
-  recordArr
-  |> Js.Array.reduce(
-       (content, (startIndex, endIndex, importSegmentContent)) =>
-         content
-         ++ (segmentContent |> Js.String.slice(~from=startIndex, ~to_=endIndex))
-         ++ importSegmentContent,
-       ""
-     )
+  _get([||], segmentName, segmentContent, map)
 };
 
 let _convertListToMap = (list) =>
@@ -157,6 +170,7 @@ let _convertListToMap = (list) =>
            )
          ) => {
            let segmentMap = Js.Dict.empty();
+           Js.Dict.set(segmentMap, "fileName", fileName);
            Js.Dict.set(segmentMap, topKey, topContent);
            Js.Dict.set(segmentMap, defineKey, defineContent);
            Js.Dict.set(segmentMap, varDeclareKey, varDeclareContent);
@@ -201,12 +215,18 @@ let parseImport = (list) => {
            ++ _buildGlslContent(
                 fileName,
                 (
-                  _getAllImportContent(topKey, topContent, map),
-                  _getAllImportContent(defineKey, defineContent, map),
-                  _getAllImportContent(varDeclareKey, varDeclareContent, map),
-                  _getAllImportContent(funcDeclareKey, funcDeclareContent, map),
-                  _getAllImportContent(funcDefineKey, funcDefineContent, map),
-                  _getAllImportContent(bodyKey, bodyContent, map)
+                  /* _getAllImportContent(topKey, topContent, map),
+                     _getAllImportContent(defineKey, defineContent, map),
+                     _getAllImportContent(varDeclareKey, varDeclareContent, map),
+                     _getAllImportContent(funcDeclareKey, funcDeclareContent, map),
+                     _getAllImportContent(funcDefineKey, funcDefineContent, map),
+                     _getAllImportContent(bodyKey, bodyContent, map) */
+                  _getAllImportContent(fileName, topKey, topContent, map),
+                  _getAllImportContent(fileName, defineKey, defineContent, map),
+                  _getAllImportContent(fileName, varDeclareKey, varDeclareContent, map),
+                  _getAllImportContent(fileName, funcDeclareKey, funcDeclareContent, map),
+                  _getAllImportContent(fileName, funcDefineKey, funcDefineContent, map),
+                  _getAllImportContent(fileName, bodyKey, bodyContent, map)
                 )
               ),
          ""
