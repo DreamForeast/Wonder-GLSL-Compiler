@@ -1,0 +1,26 @@
+{
+  "name": "wonder-glsl-compiler",
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    },
+    {
+      "dir": "test",
+      "subdirs": true,
+      "type": "dev"
+    }
+  ],
+  "bs-dev-dependencies": [
+    "wonder-bs-jest"
+  ],
+  "refmt": 3,
+  "bs-dependencies": [
+    "bs-node",
+    "bs-glob"
+  ],
+  "package-specs": [
+    "commonjs"
+  ],
+  "namespace": false
+}
