@@ -34,7 +34,7 @@ open ShaderChunkType;
 let _getGLSLChunkMap = (state: StateDataType.state) => state.glslChunkData.chunkMap;
 
 let getChunk = (name: string, state: StateDataType.state) =>
-  state |> _getGLSLChunkMap |> HashMapSystem.get(name) |> Js.Option.getExn;
+  state |> _getGLSLChunkMap |> WonderCommonlib.HashMapSystem.get(name) |> Js.Option.getExn;
 
 let _buildChunk =
     (
@@ -69,19 +69,7 @@ let _buildChunk =
           |> StringTool.removeBlankNewLine
           |> expect
           |> toContainString(
-               {|
-                |> set("glsl2", _buildChunk("","define B 2;","varying vec2 v_mapCoord2;","vec3 func2(vec3 lightPos);","vec3 func2(vec3 lightPos){
-                       return vec3(0.5);
-                   }","gl_FragColor = vec4(1.0,0.5,1.0,1.0);"))
-                |> set("glsl1", _buildChunk("precision highp float;","define B 2;","varying vec2 v_mapCoord0;
-
-                   varying vec2 v_mapCoord1;","vec3 func1(vec3 lightPos);","vec3 func2(vec3 lightPos){
-                       return vec3(0.5);
-                   }
-                   vec3 func1(vec3 lightPos){
-                       return vec3(1.0);
-                   }","gl_Position = u_pMatrix * u_vMatrix * mMatrix * vec4(a_position, 1.0);"))
-               |}
+               "|> set(\"glsl2\", _buildChunk({||},{|define B 2;|},{|varying vec2 v_mapCoord2;|},{|vec3 func2(vec3 lightPos);|},{|vec3 func2(vec3 lightPos){\n                       return vec3(0.5);\n                   }|},{|gl_FragColor = vec4(1.0,0.5,1.0,1.0);|}))\n                |> set(\"glsl1\", _buildChunk({|precision highp float;|},{|define B 2;|},{|varying vec2 v_mapCoord0;\n\n                   varying vec2 v_mapCoord1;|},{|vec3 func1(vec3 lightPos);|},{|vec3 func2(vec3 lightPos){\n                       return vec3(0.5);\n                   }\n                   vec3 func1(vec3 lightPos){\n                       return vec3(1.0);\n                   }|},{|gl_Position = u_pMatrix * u_vMatrix * mMatrix * vec4(a_position, 1.0);|}))"
                |> StringTool.removeBlankNewLine
              )
         }

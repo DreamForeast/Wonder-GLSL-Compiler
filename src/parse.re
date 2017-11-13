@@ -5,7 +5,19 @@ let _buildGlslContent = (name: string, (top, define, varDeclare, funcDeclare, fu
   | "" =>
     switch (name |> Js.String.startsWith("./"), name |> Js.String.startsWith("../")) {
     | (false, false) => {j|
-|> set("$name", _buildChunk("$top","$define","$varDeclare","$funcDeclare","$funcDefine","$body"))
+|> set("$name", _buildChunk({|
+$top
+|},{|
+$define
+|},{|
+$varDeclare
+|},{|
+$funcDeclare
+|},{|
+$funcDefine
+|},{|
+$body
+|}))
 |j}
     | (_, _) => failwith({j|should import fileName, not filePath|j})
     }

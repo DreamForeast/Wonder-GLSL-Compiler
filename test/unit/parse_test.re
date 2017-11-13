@@ -152,10 +152,7 @@ varying vec2 v_mapCoord2;
               StringTool.removeBlankNewLine(Parse.parseImport(list))
               |>
               expect == StringTool.removeBlankNewLine(
-                          {|
-|>set("basic0",_buildChunk("","defineC3;defineD4;defineA1;defineD4;defineB2;","varyingvec2v_mapCoord2;varyingvec2v_mapCoord0;varyingvec2v_mapCoord1;","","",""))|>set("basic1",_buildChunk("","defineC3;defineD4;","varyingvec2v_mapCoord1;","","",""))
-|>set("basic2",_buildChunk("","defineD4;","varyingvec2v_mapCoord2;","","",""))
-|}
+                          "\n|>set(\"basic0\",_buildChunk({||},{|defineC3;defineD4;defineA1;defineD4;defineB2;|},{|varyingvec2v_mapCoord2;varyingvec2v_mapCoord0;varyingvec2v_mapCoord1;|},{||},{||},{||}))\n|>set(\"basic1\",_buildChunk({||},{|defineC3;defineD4;|},{|varyingvec2v_mapCoord1;|},{||},{||},{||}))\n|>set(\"basic2\",_buildChunk({||},{|defineD4;|},{|varyingvec2v_mapCoord2;|},{||},{||},{||}))\n"
                         )
             }
           );
