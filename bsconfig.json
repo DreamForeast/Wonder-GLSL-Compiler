@@ -12,7 +12,8 @@
     }
   ],
   "bs-dev-dependencies": [
-    "wonder-bs-jest"
+    "wonder-bs-jest",
+    "wonder-bs-sinon"
   ],
   "refmt": 3,
   "bs-dependencies": [
