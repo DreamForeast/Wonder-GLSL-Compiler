@@ -50,7 +50,7 @@ let _convertArrayToList = (array: array(string)) =>
 let createShunkSystemFile = (glslPathArr: array(string), destFilePath: string, doneFunc) =>
   glslPathArr
   |> Js.Array.map((glslPath) => Glob.sync(glslPath))
-  |> ArraySystem.flatten
+  |> WonderCommonlib.ArraySystem.flatten
   |> _convertArrayToList
   |> List.map(
        (actualGlslPath) =>

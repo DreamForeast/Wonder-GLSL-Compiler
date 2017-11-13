@@ -18,7 +18,8 @@
   "refmt": 3,
   "bs-dependencies": [
     "bs-node",
-    "bs-glob"
+    "bs-glob",
+    "wonder-commonlib"
   ],
   "package-specs": [
     "commonjs"
