@@ -153,57 +153,156 @@ varying vec2 v_mapCoord2;
               |>
               expect == StringTool.removeBlankNewLine(
                           {|
-|> set("basic0", _buildChunk("","define C 3;define D 4;    define A 1;define D 4;","varying vec2 v_mapCoord2;    varying vec2 v_mapCoord0;varying vec2 v_mapCoord1;","","","")
-|> set("basic1", _buildChunk("","define C 3;define D 4;","","","","")
-|> set("basic2", _buildChunk("","","","","","")
+|>set("basic0",_buildChunk("","defineC3;defineD4;defineA1;defineD4;defineB2;","varyingvec2v_mapCoord2;varyingvec2v_mapCoord0;varyingvec2v_mapCoord1;","","",""))|>set("basic1",_buildChunk("","defineC3;defineD4;","varyingvec2v_mapCoord1;","","",""))
+|>set("basic2",_buildChunk("","defineD4;","varyingvec2v_mapCoord2;","","",""))
 |}
                         )
             }
           );
-          test(
-            "check circular reference",
+          describe(
+            "check",
             () => {
-              let list = [
-                (
-                  "basic0",
-                  ("top", ""),
-                  ("define", {|
+              test(
+                "check circular reference",
+                () => {
+                  let list = [
+                    (
+                      "basic0",
+                      ("top", ""),
+                      ("define", {|
 #import "basic1"
 define A 1;
     |}),
-                  ("varDeclare", ""),
-                  ("funcDeclare", ""),
-                  ("funcDefine", ""),
-                  ("body", "")
-                ),
-                (
-                  "basic1",
-                  ("top", ""),
-                  ("define", {|
+                      ("varDeclare", ""),
+                      ("funcDeclare", ""),
+                      ("funcDefine", ""),
+                      ("body", "")
+                    ),
+                    (
+                      "basic1",
+                      ("top", ""),
+                      ("define", {|
 define C 3;
 #import "basic2"
     |}),
-                  ("varDeclare", ""),
-                  ("funcDeclare", ""),
-                  ("funcDefine", ""),
-                  ("body", "")
-                ),
-                (
-                  "basic2",
-                  ("top", ""),
-                  ("define", {|
+                      ("varDeclare", ""),
+                      ("funcDeclare", ""),
+                      ("funcDefine", ""),
+                      ("body", "")
+                    ),
+                    (
+                      "basic2",
+                      ("top", ""),
+                      ("define", {|
 #import "basic0"
     |}),
-                  ("varDeclare", ""),
-                  ("funcDeclare", ""),
-                  ("funcDefine", ""),
-                  ("body", "")
-                )
-              ];
-              expect(() => Parse.parseImport(list) |> ignore)
-              |> toThrowMessage(
-                   "not allow circular reference(the reference path is basic0=>basic1=>basic2=>basic0)"
-                 )
+                      ("varDeclare", ""),
+                      ("funcDeclare", ""),
+                      ("funcDefine", ""),
+                      ("body", "")
+                    )
+                  ];
+                  expect(() => Parse.parseImport(list) |> ignore)
+                  |> toThrowMessage(
+                       "not allow circular reference(the reference path is basic0=>basic1=>basic2=>basic0)"
+                     )
+                }
+              );
+              describe(
+                "should import fileName, not filePath",
+                () => {
+                  test(
+                    "fileName shouldn't start with ./",
+                    () => {
+                      let list = [
+                        (
+                          "basic0",
+                          ("top", ""),
+                          ("define", {|
+#import "./src/basic1"
+define A 1;
+    |}),
+                          ("varDeclare", ""),
+                          ("funcDeclare", ""),
+                          ("funcDefine", ""),
+                          ("body", "")
+                        ),
+                        (
+                          "basic1",
+                          ("top", ""),
+                          ("define", ""),
+                          ("varDeclare", ""),
+                          ("funcDeclare", ""),
+                          ("funcDefine", ""),
+                          ("body", "")
+                        )
+                      ];
+                      expect(() => Parse.parseImport(list) |> ignore)
+                      |> toThrowMessage("should import fileName, not filePath")
+                    }
+                  );
+                  test(
+                    "fileName shouldn't start with ../",
+                    () => {
+                      let list = [
+                        (
+                          "basic0",
+                          ("top", ""),
+                          ("define", {|
+#import "../src/basic1"
+define A 1;
+    |}),
+                          ("varDeclare", ""),
+                          ("funcDeclare", ""),
+                          ("funcDefine", ""),
+                          ("body", "")
+                        ),
+                        (
+                          "basic1",
+                          ("top", ""),
+                          ("define", ""),
+                          ("varDeclare", ""),
+                          ("funcDeclare", ""),
+                          ("funcDefine", ""),
+                          ("body", "")
+                        )
+                      ];
+                      expect(() => Parse.parseImport(list) |> ignore)
+                      |> toThrowMessage("should import fileName, not filePath")
+                    }
+                  )
+                }
+              );
+              test(
+                "should import fileName without extname",
+                () => {
+                  let list = [
+                    (
+                      "basic0",
+                      ("top", ""),
+                      ("define", {|
+#import "basic1.glsl"
+define A 1;
+    |}),
+                      ("varDeclare", ""),
+                      ("funcDeclare", ""),
+                      ("funcDefine", ""),
+                      ("body", "")
+                    ),
+                    (
+                      "basic1",
+                      ("top", ""),
+                      ("define", ""),
+                      ("varDeclare", ""),
+                      ("funcDeclare", ""),
+                      ("funcDefine", ""),
+                      ("body", "")
+                    )
+                  ];
+                  expect(() => Parse.parseImport(list) |> ignore)
+                  |> toThrowMessage("should import fileName without .glsl")
+                }
+              )
             }
           )
         }

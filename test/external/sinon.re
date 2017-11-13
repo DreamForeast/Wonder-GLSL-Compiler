@@ -54,8 +54,8 @@ let createMethodStub: (sandbox, obj, string) => stub = [%bs.raw
 |}
 ];
 
-let createMethodStubWithJsObjSandbox = (sandbox, obj, string) =>
-  createMethodStub(refJsObjToSandbox(sandbox^), obj, string);
+let createMethodStubWithJsObjSandbox = (sandbox, obj, methodName) =>
+  createMethodStub(refJsObjToSandbox(sandbox^), obj, methodName);
 
 let returns = (returnVal, stub: stub) : stub => stubToJsObj(stub)##returns(returnVal);
 
@@ -79,6 +79,11 @@ let getArgsFromEmptyStub = (call: Js.t({..})) => {
 };
 
 let getArgs = (call: Js.t({..})) => Array.to_list(call##args);
+
+let getSpecificArg = (index: int, call: Js.t({..})) => {
+  let args = call##args;
+  Array.to_list(args[index])
+};
 
 let getCallCount = (stub: stub) : int => stubToJsObj(stub)##callCount;
 
