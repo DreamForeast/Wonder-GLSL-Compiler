@@ -1,11 +1,11 @@
 {
   "name": "wonder-glsl-compiler",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "authors": "DreamForest",
   "description": "glsl compiler",
   "homepage": "https://github.com/DreamForeast/Wonder-GLSL-Compiler.js",
   "license": "MIT",
-  "main": "",
+  "main": "./lib/js/src/create.js",
   "scripts": {
     "start": "node ./server/app.js",
     "watch": "bsb -clean-world -make-world -w",
