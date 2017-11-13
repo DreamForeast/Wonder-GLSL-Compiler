@@ -48,31 +48,9 @@ let _convertArrayToList = (array: array(string)) =>
   array |> Js.Array.reduce((list, str) => [str, ...list], []);
 
 let createShunkSystemFile = (glslPathArr: array(string), destFilePath: string, doneFunc) =>
-  /* let content = _functionContent; */
-  /* let glslContent = ref(""); */
   glslPathArr
   |> Js.Array.map((glslPath) => Glob.sync(glslPath))
   |> ArraySystem.flatten
-  /* |> Js.Array.reduce(
-       (glslContentList, glslPath) =>
-         Glob.sync(glslPath)
-         |> Js.Array.reduce
-              /* (glslContent: string, actualGlslPath) =>
-                   glslContent ++ (readFileSync(actualGlslPath, `utf8) |> Parse.parse(actualGlslPath)),
-                 glslContent */
-              (
-                (glslContentList, actualGlslPath) => {
-                  DebugUtils.log(actualGlslPath) |> ignore;
-                  [
-                    Node.Fs.readFileSync(actualGlslPath, `utf8)
-                    |> Parse.parseSegment(actualGlslPath),
-                    ...glslContentList
-                  ]
-                },
-                glslContentList
-              ),
-       []
-     ) */
   |> _convertArrayToList
   |> List.map(
        (actualGlslPath) =>
