@@ -63,9 +63,6 @@ let createShunkSystemFile = (glslPathArr: array(string), destFilePath: string, d
                 ],
                 glslContentList
               ),
-       /* let a = readFileSync(glslPath, `utf8) |> String.length;
-          [@bs] doneFunc() |> ignore;
-          () */
        []
      )
   |> Parse.parseImport

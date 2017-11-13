@@ -1,5 +1,3 @@
-open Type;
-
 /* @define
    #import "common_vertex"
 
@@ -15,8 +13,7 @@ let _buildGlslContent = (name: string, (top, define, varDeclare, funcDeclare, fu
 |> set("$name", _buildChunk("$top","$define","$varDeclare","$funcDeclare","$funcDefine","$body")
 |j};
 
-let _checkCircleImport = (segmentContent: string) => {};
-
+/* let _checkCircleImport = (segmentContent: string) => {}; */
 /* let _getEndImportContent = (fileName, segmentName:string, segmentContent: string, map):string => {
      let importFlagRe = [%re {|/#import\s+"(.+)"/g|}];
      let recordArr = [];
@@ -86,22 +83,21 @@ let _getAllImportContent = (fileName: string, segmentName: string, segmentConten
      }
                 }
      } */
-  let rec _get = (fileNameArr: array(string), segmentName: string, segmentContent: string, map) => {
-    let importFlagRe = [%re {|/#import\s+"(.+)"/g|}];
+  let _createImportFlagRe = () => [%re {|/#import\s+"(.+)"/g|}];
+  let rec _get = (fileNameList: list(string), segmentName: string, segmentContent: string, map) => {
+    let importFlagRe = _createImportFlagRe();
     let recordArr = [||];
-    /* let fileNameArr = [||]; */
     let startIndex = ref(0);
     let break = ref(false);
     while (! break^) {
       switch (importFlagRe |> Js.Re.exec(segmentContent)) {
       | None => break := true
       | Some(result) =>
-        /* let endIndex = Js.Re.lastIndex(result); */
         recordArr
         |> Js.Array.push
              /* Js.Re.index(result), Js.Re.lastIndex(result),  */
              ((
-               startIndex,
+               startIndex^,
                Js.Re.index(result),
                /* endIndex, */
                Js.Nullable.bind(
@@ -113,8 +109,15 @@ let _getAllImportContent = (fileName: string, segmentName: string, segmentConten
                      | None => failwith({j|import glsl file:$importFileName should exist|j})
                      | Some(segmentMap) =>
                        let fileName = Js.Dict.unsafeGet(segmentMap, "fileName");
-                       if (Js.Array.includes(fileName, fileNameArr)) {
-                         let msg = (fileNameArr |> Js.Array.joinWith("=>")) ++ "=>" ++ fileName;
+                       DebugUtils.log(fileName) |> ignore;
+                       let newFileNameList = [fileName, ...fileNameList];
+                       if (List.mem(fileName, fileNameList)) {
+                         DebugUtils.log("false") |> ignore;
+                         let msg =
+                           newFileNameList
+                           |> List.rev
+                           |> List.fold_left((str, fileName) => str ++ fileName ++ "=>", "")
+                           |> Js.String.slice(~from=0, ~to_=(-2));
                          failwith({j|not allow circular reference(the reference path is $msg)|j})
                        } else {
                          switch (Js.Dict.get(segmentMap, segmentName)) {
@@ -123,9 +126,10 @@ let _getAllImportContent = (fileName: string, segmentName: string, segmentConten
                              {j|segment:$segmentName should exist in $importFileName.glsl|j}
                            )
                          | Some(importContent) =>
-                           if (importFlagRe |> Js.Re.test(importContent)) {
-                             fileNameArr |> Js.Array.push(fileName) |> ignore;
-                             _get(fileNameArr, segmentName, importContent, map)
+                           DebugUtils.log(importContent) |> ignore;
+                           if (_createImportFlagRe() |> Js.Re.test(importContent)) {
+                             _get
+                               (newFileNameList, segmentName, importContent, map)
                            } else {
                              importContent
                            }
@@ -134,7 +138,8 @@ let _getAllImportContent = (fileName: string, segmentName: string, segmentConten
                      }
                  )
                )
-             ));
+             ))
+        |> ignore;
         startIndex := Js.Re.lastIndex(importFlagRe)
       }
     };
@@ -147,7 +152,7 @@ let _getAllImportContent = (fileName: string, segmentName: string, segmentConten
          ""
        )
   };
-  _get([||], segmentName, segmentContent, map)
+  _get([fileName], segmentName, segmentContent, map)
 };
 
 let _convertListToMap = (list) =>
@@ -184,13 +189,9 @@ let _convertListToMap = (list) =>
        );
 
 let parseImport = (list) => {
-  /* todo check: shouldn't has circle import! */
-  /* content; */
-  /* (top, define, varDeclare, funcDeclare, funcDefine, body) */
   let map = _convertListToMap(list);
   list
   |> List.fold_left
-       /* (content, (fileName, top, define, varDeclare, funcDeclare, funcDefine, body)) => { */
        (
          (
            content,
@@ -242,7 +243,8 @@ let parseSegment = (actualGlslPath: string, content: string) => {
        (list, flag) => [
          switch (content |> Js.String.indexOf(flag)) {
          | (-1) => ""
-         | startIndex =>
+         | index =>
+           let startIndex = index + Js.String.length(flag);
            switch (endFlagRe |> Js.Re.exec(content)) {
            | None => failwith("@end should match to segement flag")
            | Some(result) =>
