@@ -1,6 +1,6 @@
 {
   "name": "wonder-glsl-compiler",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "authors": "DreamForest",
   "description": "glsl compiler",
   "homepage": "https://github.com/DreamForeast/Wonder-GLSL-Compiler.js",
