@@ -40,7 +40,7 @@ let _buildShunkSystemFileContent = (glslContent) =>
   _functionContent ++ _buildInitDataContent(glslContent);
 
 let _writeToShunkSystemFile = (destFilePath, doneFunc, content) => {
-  Node.Fs.writeFileSync(~filename=destFilePath, ~text=content);
+  Node.Fs.writeFileSync(destFilePath, content, `utf8);
   [@bs] doneFunc() |> ignore
 };
 

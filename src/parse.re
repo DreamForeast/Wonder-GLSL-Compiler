@@ -1,4 +1,4 @@
-let _getFileName = (path: string) => Node.Path.basenameExt(path, PathExtend.extname(path));
+let _getFileName = (path: string) => Node.Path.basename_ext(path, PathExtend.extname(path));
 
 let _buildGlslContent = (name: string, (top, define, varDeclare, funcDeclare, funcDefine, body)) =>
   switch (PathExtend.extname(name)) {
