@@ -8,11 +8,11 @@ let getChunk = (name: string, state: StateDataType.state) =>
 
 let _buildChunk =
     (
-      top: string,
-      define: string,
+      (top: string,
+      define: string),
       varDeclare: string,
-      funcDeclare: string,
-      funcDefine: string,
+      (funcDeclare: string,
+      funcDefine: string),
       body: string
     ) => {
   top,
