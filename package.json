@@ -1,17 +1,17 @@
 {
   "name": "wonder-glsl-compiler",
   "version": "0.0.11",
-  "authors": "DreamForest",
+  "authors": "Wonder",
   "description": "glsl compiler",
-  "homepage": "https://github.com/DreamForeast/Wonder-GLSL-Compiler.js",
+  "homepage": "https://github.com/Wonder-Technology/Wonder-GLSL-Compiler.js",
   "license": "MIT",
   "main": "./lib/js/src/create.js",
   "scripts": {
     "start": "node ./server/app.js",
     "watch": "bsb -clean-world -make-world -w",
     "build": "bsb -clean-world -make-world",
-    "test": "npm run build && jest --config jest.json",
-    "test:watch": "npm run build && jest --watch --config jest.json"
+    "test": "jest --config jest.json",
+    "test:watch": "jest --watch --config jest.json"
   },
   "devDependencies": {
     "babel": "^6.23.0",
@@ -25,6 +25,6 @@
   },
   "dependencies": {
     "bs-glob": "reasonml-community/bs-glob",
-    "wonder-commonlib": "^0.2.8"
+    "wonder-commonlib": "0.2.19"
   }
 }
