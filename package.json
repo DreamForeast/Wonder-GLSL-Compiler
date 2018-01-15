@@ -1,6 +1,6 @@
 {
   "name": "wonder-glsl-compiler",
-  "version": "0.0.12",
+  "version": "0.1.0",
   "authors": "Wonder",
   "description": "glsl compiler",
   "homepage": "https://github.com/Wonder-Technology/Wonder-GLSL-Compiler.js",
@@ -25,6 +25,6 @@
   },
   "dependencies": {
     "bs-glob": "reasonml-community/bs-glob",
-    "wonder-commonlib": "0.2.19"
+    "wonder-commonlib": "^0.2.19"
   }
 }
