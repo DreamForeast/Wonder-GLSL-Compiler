@@ -27,8 +27,6 @@ let _ =
           |> expect
           |> toContainString(
                {|
-open Contract;
-
 open ShaderChunkType;
 
 let _getGLSLChunkMap = (state: StateDataType.state) => state.glslChunkData.chunkMap;

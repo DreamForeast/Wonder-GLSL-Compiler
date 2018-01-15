@@ -1,6 +1,4 @@
 let _functionContent = {|
-open Contract;
-
 open ShaderChunkType;
 
 let _getGLSLChunkMap = (state: StateDataType.state) => state.glslChunkData.chunkMap;
