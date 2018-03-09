@@ -23,7 +23,7 @@ let _buildChunk =
   body
 };
 
-let initData = () =>
+let create = () =>
 |};
 
 let _buildInitDataContent = (glslContent: string) => {j|
