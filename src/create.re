@@ -1,39 +1,41 @@
 let _functionContent = {|
-open ShaderChunkType;
-open MainStateDataType;
+  open ShaderChunkType;
 
-let _getGLSLChunkMap = (state) => state.glslChunkRecord.chunkMap;
+  open StateDataMainType;
 
-let getChunk = (name: string, state) =>
-  state |> _getGLSLChunkMap |> WonderCommonlib.HashMapSystem.get(name) |> Js.Option.getExn;
+  let _getGLSLChunkMap = ({chunkMap}) => chunkMap;
 
-let _buildChunk =
-    (
-      (top: string,
-      define: string),
-      varDeclare: string,
-      (funcDeclare: string,
-      funcDefine: string),
-      body: string
-    ) => {
-  top,
-  define,
-  varDeclare,
-  funcDeclare,
-  funcDefine,
-  body
-};
+  let getChunk = (name: string, glslChunkRecord) =>
+    glslChunkRecord
+    |> _getGLSLChunkMap
+    |> WonderCommonlib.HashMapService.get(name)
+    |> Js.Option.getExn;
 
-let create = () =>
-|};
+  let _buildChunk =
+      (
+        (top: string, define: string),
+        varDeclare: string,
+        (funcDeclare: string, funcDefine: string),
+        body: string
+      ) => {
+    top,
+    define,
+    varDeclare,
+    funcDeclare,
+    funcDefine,
+    body
+  };
+
+  let create = () =>
+  |};
 
 let _buildInitDataContent = (glslContent: string) => {j|
-  WonderCommonlib.HashMapSystem.{
-    chunkMap:
-      createEmpty()
-      $glslContent
-  };
-|j};
+    WonderCommonlib.HashMapService.{
+      chunkMap:
+        createEmpty()
+        $glslContent
+    };
+  |j};
 
 let _buildShunkSystemFileContent = (glslContent) =>
   _functionContent ++ _buildInitDataContent(glslContent);
