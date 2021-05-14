@@ -22,7 +22,6 @@
     "wonder-bs-sinon": "latest"
   },
   "dependencies": {
-    "bs-glob": "^0.1.1",
     "wonder-commonlib": "latest"
   }
 }
